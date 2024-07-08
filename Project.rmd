@@ -1,0 +1,192 @@
+---
+title: "Google Analytics Capstone Project"
+author: "Aditi Agarwal"
+date: '2022-10-10'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+##  Scenario 
+
+You are a junior data analyst working in the marketing analyst team at Cyclistic, a bike-share company in Chicago. 
+The director of marketing believes the company’s future success depends on maximizing the number of annual memberships. Therefore, your team wants to understand how casual riders and annual members use Cyclistic bikes differently. From these insights, your team will design a new marketing strategy to convert casual riders into annual members.  
+
+## Objective
+1. How do annual members and casual riders use Cyclistic bikes differently? 
+2. Why would casual riders buy Cyclistic annual memberships? 
+3. How can Cyclistic use digital media to influence casual riders to become members? 
+
+## Processing data
+The Cyclistic’s historical trip data was used to analyze and identify trends. I downloaded the previous 12 months of Cyclistic trip data.This is public data about how different customer types are using Cyclistic bikes.
+
+#### Calling libraries
+```{r results='hide', message=FALSE}
+library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(skimr)
+library(janitor)
+library(lubridate)
+```
+
+####Loading data 
+```{r }
+2021_Jan <- read.csv("202101-divvy-tripdata.csv")
+X2021_Jan <- read.csv("202101-divvy-tripdata.csv")
+X2021_Feb <- read.csv("202102-divvy-tripdata.csv")
+X2021_Jan <- read.csv("202101-divvy-tripdata.csv")
+X2021_Feb <- read.csv("202102-divvy-tripdata.csv")
+X2021_Mar <- read.csv("202103-divvy-tripdata.csv")
+X2021_Apr <- read.csv("202104-divvy-tripdata.csv")
+X2021_May <- read.csv("202105-divvy-tripdata.csv")
+X2021_Jun <- read.csv("202106-divvy-tripdata.csv")
+X2021_Jul <- read.csv("202107-divvy-tripdata.csv")
+X2021_Aug <- read.csv("202108-divvy-tripdata.csv")
+X2021_Sep <- read.csv("202109-divvy-tripdata.csv")
+X2021_Oct <- read.csv("202110-divvy-tripdata.csv")
+X2021_Nov <- read.csv("202111-divvy-tripdata.csv")
+X2021_Dec <- read.csv("202112-divvy-tripdata.csv")
+```
+
+#### Comparing files
+
+First we look at the files to check if the columns are same and have same data type
+```{r}
+str(X2021_Jan)
+str(X2021_Jan)
+str(X2021_Feb)
+str(X2021_Mar)
+str(X2021_Apr)
+str(X2021_May)
+str(X2021_Jun)
+str(X2021_Jul)
+str(X2021_Aug)
+str(X2021_Sep)
+str(X2021_Oct)
+str(X2021_Nov)
+str(X2021_Dec)
+```
+
+Now we compare all the files as a summary 
+```{r}
+compare_df_cols(X2021_Jan,X2021_Feb,X2021_Mar,X2021_Apr,X2021_May,X2021_Jun,X2021_Jul,X2021_Aug,X2021_Sep,X2021_Oct,X2021_Nov,X2021_Dec)
+```
+
+#### Changing data types
+We saw that start and end date were in character format so we need to change it to date and time format. 
+```{r}
+X2021_Jan$started_at = strptime(X2021_Jan$started_at, format = "%d-%m-%Y %H:%M")
+X2021_Jan$ended_at = strptime(X2021_Jan$ended_at, format = "%d-%m-%Y %H:%M")
+
+X2021_Feb$started_at = strptime(X2021_Feb$started_at, format = "%d-%m-%Y %H:%M")
+X2021_Feb$ended_at = strptime(X2021_Feb$ended_at, format = "%d-%m-%Y %H:%M")
+
+X2021_Mar$started_at = strptime(X2021_Mar$started_at, format = "%d-%m-%Y %H:%M")
+X2021_Mar$ended_at = strptime(X2021_Mar$ended_at, format = "%d-%m-%Y %H:%M")
+
+X2021_Apr$started_at = strptime(X2021_Apr$started_at, format = "%d-%m-%Y %H:%M")
+X2021_Apr$ended_at = strptime(X2021_Apr$ended_at, format = "%d-%m-%Y %H:%M")
+
+X2021_May$started_at = strptime(X2021_May$started_at, format = "%d-%m-%Y %H:%M")
+X2021_May$ended_at = strptime(X2021_May$ended_at, format = "%d-%m-%Y %H:%M")
+
+X2021_Jun$started_at = strptime(X2021_Jun$started_at, format = "%d-%m-%Y %H:%M")
+X2021_Jun$ended_at = strptime(X2021_Jun$ended_at, format = "%d-%m-%Y %H:%M")
+
+X2021_Jul$started_at = strptime(X2021_Jul$started_at, format = "%d-%m-%Y %H:%M")
+X2021_Jul$ended_at = strptime(X2021_Jul$ended_at, format = "%d-%m-%Y %H:%M")
+
+X2021_Aug$started_at = strptime(X2021_Aug$started_at, format = "%d-%m-%Y %H:%M")
+X2021_Aug$ended_at = strptime(X2021_Aug$ended_at, format = "%d-%m-%Y %H:%M")
+
+X2021_Sep$started_at = strptime(X2021_Sep$started_at, format = "%d-%m-%Y %H:%M")
+X2021_Sep$ended_at = strptime(X2021_Sep$ended_at, format = "%d-%m-%Y %H:%M")
+
+X2021_Oct$started_at = strptime(X2021_Oct$started_at, format = "%d-%m-%Y %H:%M")
+X2021_Oct$ended_at = strptime(X2021_Oct$ended_at, format = "%d-%m-%Y %H:%M")
+
+X2021_Nov$started_at = strptime(X2021_Nov$started_at, format = "%d-%m-%Y %H:%M")
+X2021_Nov$ended_at = strptime(X2021_Nov$ended_at, format = "%d-%m-%Y %H:%M")
+
+X2021_Dec$started_at = strptime(X2021_Dec$started_at, format = "%d-%m-%Y %H:%M")
+X2021_Dec$ended_at = strptime(X2021_Dec$ended_at, format = "%d-%m-%Y %H:%M")
+
+```
+
+#### Merging files
+```{r}
+all_trips_2021 <- bind_rows(X2021_Jan,X2021_Feb,X2021_Mar,X2021_Apr,X2021_May,X2021_Jun,X2021_Jul,X2021_Aug,X2021_Sep,X2021_Oct,X2021_Nov,X2021_Dec)
+
+```
+
+Final check
+```{r}
+str(all_trips_2021)
+```
+
+The data is in proper format now 
+
+
+#### Adding variable and checking accuracy 
+
+We need to add a calculated field "Tripduration" which is the difference in time between the started and ended columns
+```{r}
+all_trips_2021 <-mutate(all_trips_2021,tripduration=difftime(ended_at,started_at,units = "secs"))
+```
+
+Now we need to filter out any tripduration<0 values
+```{r}
+filter(all_trips_2021,tripduration < 0)
+```
+
+Removing rows with such values 
+```{r}
+all_trips_2021 <- all_trips_2021[!(all_trips_2021$tripduration<0),]
+```
+
+Now we create a new column "weekday" and assigns it the day when the bikes were rented 
+```{r}
+all_trips_2021<-mutate(all_trips_2021,weekday=weekdays(started_at))
+```
+
+Removing missing/blank data
+```{r}
+#na_if("")  %>%  # We are replacing blanks with NA
+  na.omit(all_trips_2021)   # Now we are removing rows with NA values in any column
+```
+
+Removing start_station_name and end_station_name blank results 
+```{r}
+all_trips_2021 <- all_trips_2021 %>%
+  filter(!(is.na(start_station_name) | start_station_name == "") ) %>% 
+  
+  filter(!(is.na(end_station_name) | end_station_name == ""))
+```
+
+Creating a data frame to check that there are no duplicates 
+```{r}
+ride_id_check <- all_trips_2021 %>%
+  count(ride_id) %>%
+  filter(n > 1)
+```
+
+Arranging data in ascending order by date 
+```{r}
+all_trips_2021 <-arrange(all_trips_2021,started_at)
+```
+
+Finally reviewing our clean data
+```{r}
+View(all_trips_2021)
+```
+
+#### Exporting clean and prepared data 
+```{r}
+write.csv(all_trips_2021,"C:\\Users\\Aditi\\OneDrive\\Documents\\Case Study\\all_trips_2021.csv")
+```
+
+The data visualisation in done via Tableau. 
+Click here to see the data viz (https://public.tableau.com/views/GoogleCourse-CyclistDatasetAnalysis/GoogleCapstoneProject_1?:language=en-GB&:display_count=n&:origin=viz_share_link)
